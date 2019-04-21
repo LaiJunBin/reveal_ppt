@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>微積分報告</title>
+    <!-- reveal.js v3.6.0 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.6.0/css/reveal.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.6.0/css/theme/black.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.6.0/js/reveal.min.js"></script>
+
+    <style>
+        * {
+            user-select: none;
+        }
+
+        .align-top {
+            top: 0 !important;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        li>ul>li {
+            font-size: 0.75em !important;
+        }
+
+        .bg-white {
+            background: #fff !important;
+            border: 4px solid #333 !important;
+        }
+
+        .d-flex {
+            display: flex !important;
+        }
+
+        .reveal section .d-flex>img {
+            margin-right: 10px;
+        }
+
+        td,
+        th {
+            border: 1px solid #ddd !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section>
+                <h2>20190424 報告簡報</h2>
+                <blockquote>
+                    <p>四技資管一甲06賴俊賓</p>
+                </blockquote>
+            </section>
+            <section class="align-top text-left">
+                <h2>Outline</h2>
+                <ul>
+                    <li>圖論 </li>
+                    <li>最小成本生成樹 演算法
+                        <ul>
+                            <li>Prim</li>
+                            <li>Kruskal</li>
+                        </ul>
+                    </li>
+                    <li>
+                        最短路徑問題 演算法
+                        <ul>
+                            <li>Dijkstra</li>
+                            <li>Bellman–Ford</li>
+                        </ul>
+                    </li>
+                    <li>遞迴與動態規劃
+                        <ul>
+                            <li>費式數列</li>
+                            <li>找零錢問題</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <section>
+                    <h2>圖論</h2>
+                </section>
+                <section>
+                    <h2>圖</h2>
+                    <div class="d-flex">
+                        <section style="margin-right:30px;">
+                            點(vertex)
+                            <img src="./images/vertex.png" alt="vertex" class="bg-white">
+                            邊(edge)
+                            <img src="./images/edge.png" alt="edge" class="bg-white">
+                        </section>
+                        <img src="./images/graph.png" alt="圖" class="bg-white">
+                    </div>
+                </section>
+
+                <section>
+                    <div class="d-flex" style="flex-direction: column;">
+                        <div class="images d-flex" style="justify-content: center;">
+                            <img src="./images/graph_1.png" alt="graph1" style="max-width:33vw;max-height:33vh">
+                            <img src="./images/graph_3.png" alt="graph3" style="max-width:33vw;max-height:33vh">
+                        </div>
+                        <div class="images d-flex" style="justify-content: center;">
+                            <img src="./images/graph_2.png" alt="graph2" style="max-width:33vw;max-height:33vh">
+                            <img src="./images/graph_4.png" alt="graph4" style="max-width:33vw;max-height:33vh">
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>如何存圖</h3>
+                </section>
+
+                <section>
+                    <!-- A,B,6 A,E,9 B,C,3 B,D,5 C,D,7 B,F,8 D,E,10 D,F,11 A,F,12 E,F,15 -->
+                    <div class="d-flex">
+                        <img src="./images/graph_5.png" alt="graph_5" style="max-width:33vw;">
+                        <table>
+                            <caption>
+                                <h3>相鄰矩陣</h3>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">0</th>
+                                    <th scope="col">1</th>
+                                    <th scope="col">2</th>
+                                    <th scope="col">3</th>
+                                    <th scope="col">4</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">0</th>
+                                    <td>0</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>1</td>
+                                    <td>0</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>0</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">3</th>
+                                    <td>0</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>0</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">4</th>
+                                    <td>0</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section>
+                    <!-- A,B,6 A,E,9 B,C,3 B,D,5 C,D,7 B,F,8 D,E,10 D,F,11 A,F,12 E,F,15 -->
+                    <div class="d-flex">
+                        <img src="./images/graph_5.png" alt="graph_5" style="max-width:33vw;">
+                        <table>
+                            <caption>
+                                <h3>相鄰串列</h3>
+                            </caption>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">0</th>
+                                    <td>1</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>0</td>
+                                    <td>2</td>
+                                    <td>3</td>
+                                    <td>4</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>0</td>
+                                    <td>1</td>
+                                    <td>3</td>
+                                    <td>4</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">3</th>
+                                    <td>1</td>
+                                    <td>2</td>
+                                    <td>4</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">4</th>
+                                    <td>1</td>
+                                    <td>2</td>
+                                    <td>3</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </section>
+
+            <section>
+                <section>
+                    <h3>最小成本生成樹</h3>
+                </section>
+
+                <section class="text-left">
+                    <h3>樹的定義</h3>
+                    <ul>
+                        <li>只有一張圖(整張圖是連通的)</li>
+                        <li>沒有迴路</li>
+                        <li>任意兩點只有一條路徑</li>
+                    </ul>
+                </section>
+                <section>
+                    <div class="images d-flex">
+                        <figure class="d-flex" style="flex-direction: column;">
+                            <img src="./images/mst.png" alt="mst" style="max-width:33vw;max-height:33vh">
+                            <figcaption>Graph</figcaption>
+                        </figure>
+                        <figure class="d-flex" style="flex-direction: column;">
+                            <img src="./images/mst_s.png" alt="mst_solution" style="max-width:33vw;max-height:33vh">
+                            <figcaption>MST</figcaption>
+                        </figure>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Prim演算法</h3>
+                    <small
+                        class="text-left">該演算法於1930年由捷克數學家沃伊捷赫·亞爾尼克發現；並在1957年由美國計算機科學家羅伯特·普林獨立發現；1959年，艾茲格·迪科斯徹再次發現了該演算法。</small>
+                    <p class="text-left">步驟：</p>
+                    <ol>
+                        <li>從任一點出發</li>
+                        <li>尋找可以連接到的最低權重的邊且尚未走過的點加入集合</li>
+                        <li>重複執行直到所有點都被加入到集合</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h3>Prim 的實現</h3>
+                    <img src="./images/prim_java.png" alt="prim_java">
+                </section>
+
+                <section>
+                    <h3>Kruskal演算法</h3>
+                    <small class="text-left">Kruskal演算法是一種用來尋找最小生成樹的演算法，由Joseph Kruskal在1956年發表。</small>
+                    <small class="text-left">Joseph Bernard Kruskal（1928年1月29日- 2010年9月19日）是美國
+                        數學家，統計學家，計算機科學家和心理學家</small>
+                    <p class="text-left">步驟：</p>
+                    <ol>
+                        <li>將圖的邊以權重做由小到大排序</li>
+                        <li>從最小權重的邊開始，如果加入圖後不會造成迴路，就加入集合</li>
+                        <li>重複執行到點的數量-1等於邊數為止</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h3>Kruskal 的實現</h3>
+                    <img src="./images/kruskal_java.png" alt="kruskal_java">
+                </section>
+            </section>
+
+            <section>
+                <section>
+                    <h3>最短路徑問題</h3>
+                </section>
+                <section>
+                    <h3>範例：從A到G點的最短路徑</h3>
+                    <div class="images d-flex" style="justify-content: center;">
+                        <figure class="d-flex" style="flex-direction: column;flex:1;">
+                            <img src="./images/shortest_path_graph_1.png" alt="shortest_path_graph_1" style="flex:1;">
+                            <figcaption>原圖</figcaption>
+                        </figure>
+                        <figure class="d-flex" style="flex-direction: column;flex:1;">
+                            <img src="./images/shortest_path_graph_1_ans.png" alt="shortest_path_graph_1_ans"
+                                style="flex:1;">
+                            <figcaption>最短路徑</figcaption>
+                        </figure>
+                    </div>
+                    <h3>權重為16</h3>
+                </section>
+
+                <section>
+                    <h3>Dijkstra演算法</h3>
+                    <small class="text-left">戴克斯特拉演算法（英語：Dijkstra's
+                        algorithm，又譯迪傑斯特拉演算法）由荷蘭電腦科學家艾茲赫爾·戴克斯特拉在1956年提出。</small>
+                    <p class="text-left">步驟：</p>
+                    <ol>
+                        <li>weights[x,y] = x到y點的距離 -> w</li>
+                        <li>(distance[] -> d)將起點以外的點的距離設成無限大</li>
+                        <li>(current -> c)選取一個距離最近且還沒當過起點的點</li>
+                        <li>從c點往外走(v)，如果d[c]+w[c,v]小於d[v]則把值覆蓋進d[v]。</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h3>Dijkstra 的過程</h3>
+                    <div class="d-flex">
+                        <img src="./images/shortest_path_graph_1.png" alt="shortest_path_graph_1"
+                            style="align-self: flex-start;margin-right:10px;">
+                        <table style="font-size:0.75em;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>c/v</th>
+                                    <th>A</th>
+                                    <th>B</th>
+                                    <th>C</th>
+                                    <th>D</th>
+                                    <th>E</th>
+                                    <th>F</th>
+                                    <th>G</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">0</th>
+                                    <td>-</td>
+                                    <td>0</td>
+                                    <td>∞</td>
+                                    <td>∞</td>
+                                    <td>∞</td>
+                                    <td>∞</td>
+                                    <td>∞</td>
+                                    <td>∞</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>A</td>
+                                    <td>0</td>
+                                    <td>4</td>
+                                    <td>6</td>
+                                    <td>6</td>
+                                    <td>∞</td>
+                                    <td>∞</td>
+                                    <td>∞</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>B</td>
+                                    <td>0</td>
+                                    <td>4</td>
+                                    <td>5</td>
+                                    <td>6</td>
+                                    <td>11</td>
+                                    <td>∞</td>
+                                    <td>∞</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">3</th>
+                                    <td>C</td>
+                                    <td>0</td>
+                                    <td>4</td>
+                                    <td>5</td>
+                                    <td>6</td>
+                                    <td>11</td>
+                                    <td>9</td>
+                                    <td>∞</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">4</th>
+                                    <td>D</td>
+                                    <td>0</td>
+                                    <td>4</td>
+                                    <td>5</td>
+                                    <td>6</td>
+                                    <td>11</td>
+                                    <td>9</td>
+                                    <td>∞</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">5</th>
+                                    <td>F</td>
+                                    <td>0</td>
+                                    <td>4</td>
+                                    <td>5</td>
+                                    <td>6</td>
+                                    <td>10</td>
+                                    <td>9</td>
+                                    <td>17</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">6</th>
+                                    <td>E</td>
+                                    <td>0</td>
+                                    <td>4</td>
+                                    <td>5</td>
+                                    <td>6</td>
+                                    <td>10</td>
+                                    <td>9</td>
+                                    <td>16</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Bellman–Ford演算法</h3>
+                    <small class="text-left">
+                        貝爾曼-福特演算法（英語：Bellman–Ford algorithm），求解單源最短路徑問題的一種演算法，由理察·貝爾曼（Richard Bellman） 和 萊斯特·福特 創立的。
+                    </small>
+                    <small class="text-left">理察·貝爾曼（英語：Richard
+                        Bellman，1920年8月26日－1984年3月19日），美國應用數學家，美國國家科學院院士，和動態規劃的創始人。</small>
+                    <hr>
+                    <a href="https://visualgo.net/en/sssp" target="_blank">Demo</a>
+                </section>
+            </section>
+
+            <section>
+                <section>
+                    <h3>遞迴與動態規劃</h3>
+                </section>
+                <section>
+                    <h3>遞迴</h3>
+                    <small class="text-left">遞迴是一個函數，而且這個函數執行過程中又再次呼叫自己</small>
+                    <small class="text-left">通常遞迴可以做的迴圈也可以做，迴圈可以做的遞迴也可以做</small>
+                </section>
+                <section>
+                    <h3>動態規劃</h3>
+                    <small>這個演算法也是由理察·貝爾曼（Richard Bellman）所提出的。</small>
+                    <small>是一種把原問題分解為相對簡單的子問題的方式求解複雜問題的方法</small>
+                    <small>運用記憶法儲存這些問題的答案，避免重複求解，以空間換取時間。</small>
+                </section>
+                <section>
+                    <h3 class="text-left">範例1 費式數列</h3>
+                    <pre style="box-shadow: none;">定義：
+    F[0] = 0
+    F[1] = 1
+    F[n] = F[n-1] + F[n-2]</pre>
+                    <figure class="d-flex" style="flex-direction: column;">
+                        <img src="./images/fib_java.png" alt="fib_java" style="max-width:33vw;max-height:33vh">
+                        <figcaption>遞迴版</figcaption>
+                    </figure>
+                </section>
+
+                <section>
+                    <h3 class="text-left">範例1 費式數列</h3>
+                    <pre style="box-shadow: none;">定義：
+        F[0] = 0
+        F[1] = 1
+        F[n] = F[n-1] + F[n-2]</pre>
+                    <figure class="d-flex" style="flex-direction: column;">
+                        <img src="./images/fib_dp_java.png" alt="fib_dp_java" style="max-width:33vw;max-height:33vh">
+                        <figcaption>動態規劃版</figcaption>
+                    </figure>
+                </section>
+
+                <section>
+                    <h3>費式數列 兩種版本速度比較</h3>
+                    <div class="d-flex" style="justify-content: center;">
+
+                        <figure class="d-flex" style="flex-direction: column;">
+                            <img src="./images/fib_5_time.png" alt="fib_5_time" style="max-height:33vh">
+                            <figcaption>fib(5)</figcaption>
+                        </figure>
+                        <figure class="d-flex" style="flex-direction: column;">
+                            <img src="./images/fib_30_time.png" alt="fib_30_time" style="max-height:33vh">
+                            <figcaption>fib(30)</figcaption>
+                        </figure>
+                        <figure class="d-flex" style="flex-direction: column;">
+                            <img src="./images/fib_45_time.png" alt="fib_45_time" style="max-height:33vh">
+                            <figcaption>fib(45)</figcaption>
+                        </figure>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>為什麼快這麼多？</h3>
+                </section>
+
+                <section>
+                    <img src="./images/fib_tree.png" alt="fib_tree">
+                </section>
+
+            </section>
+            <section>
+                <h3>參考資料</h3>
+                <ul>
+                    <li><a href="https://zh.wikipedia.org/zh-tw/%E6%99%AE%E6%9E%97%E5%A7%86%E7%AE%97%E6%B3%95">Wiki
+                            Prim</a></li>
+                    <li><a
+                            href="https://zh.wikipedia.org/wiki/%E5%85%8B%E9%B2%81%E6%96%AF%E5%85%8B%E5%B0%94%E6%BC%94%E7%AE%97%E6%B3%95">Wiki
+                            Kruskal</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Joseph_Kruskal">Wiki Joseph_Kruskal</a></li>
+                    <li><a
+                            href="https://zh.wikipedia.org/zh-tw/%E6%88%B4%E5%85%8B%E6%96%AF%E7%89%B9%E6%8B%89%E7%AE%97%E6%B3%95">Wiki
+                            Dijkstra</a></li>
+                    <li><a
+                            href="https://zh.wikipedia.org/wiki/%E8%89%BE%E5%85%B9%E8%B5%AB%E5%B0%94%C2%B7%E6%88%B4%E5%85%8B%E6%96%AF%E7%89%B9%E6%8B%89">Wiki
+                            Edsger Wybe Dijkstra</a></li>
+                    <li><a
+                            href="https://zh.wikipedia.org/wiki/%E8%B4%9D%E5%B0%94%E6%9B%BC-%E7%A6%8F%E7%89%B9%E7%AE%97%E6%B3%95">Wiki
+                            Bellman–Ford algorithm</a></li>
+                    <li><a href="https://zh.wikipedia.org/wiki/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92">Wiki Dynamic
+                            Programming</a></li>
+                    <li><a href="https://visualgo.net/en">visualgo</a></li>
+                </ul>
+
+            </section>
+            <section>
+                <h3>報告到此結束</h3>
+            </section>
+        </div>
+    </div>
+    <script>
+        Reveal.initialize({
+            // 參數設定[註1]
+            controls: true, // 控制按鈕
+            controlsTutorial: true, // 引導初學者功能
+            controlsLayout: 'bottom-right', // 控制按鈕位置
+            controlsBackArrows: 'faded', // 返回按鈕顯示方式
+            progress: true, // 簡報進度條
+            slideNumber: true, // 簡報當前頁碼
+            history: false, // 所有動作儲存在歷史紀錄
+            keyboard: true, // 鍵盤快捷鍵
+            overview: true, // 簡報導覽模式
+            center: true, // 簡報垂直置中
+            touch: true, // 觸碰模式
+            loop: false, // 循環模式
+            rtl: false, // 簡報方向為RTL模式
+            shuffle: false, // 簡報顯示順序為隨機模式
+            autoPlayMedia: null, // 簡報內影音媒體為自動播放
+            autoSlide: 0, // 自動切換的秒數，0秒代表不自動
+            autoSlideStoppable: true, // 使用者在操作時停止自動切換
+            autoSlideMethod: Reveal.navigateNext, // 自動切換觸發的函式
+            mouseWheel: true, // 滑鼠滾輪可以切換簡報
+            transition: 'slide', // 轉場動畫
+            transitionSpeed: 'default', // 轉場速度
+            backgroundTransition: 'fade', // 簡報背景的轉場動畫
+            parallaxBackgroundImage: '', // 背景視差圖片
+            parallaxBackgroundSize: '', // 背景視差圖片尺寸(單位: 像素)
+            parallaxBackgroundHorizontal: null, // 水平背景視差，0為停止視差，null為自動計算(單位: 像素)
+            parallaxBackgroundVertical: null, // 垂直背景視差，0為停止視差，null為自動計算(單位: 像素)
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.6.0/plugin/markdown/marked.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.6.0/plugin/markdown/markdown.min.js"></script>
+</body>
+
+</html>
